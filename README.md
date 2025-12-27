@@ -15,6 +15,8 @@ uv sync
 uv run -m chat_agent.agent
 ```
 
+代码在 `src/chat_agent/agent.py` 中。
+
 ## 思维树
 
 设计的思维状态为：
@@ -24,3 +26,5 @@ uv run -m chat_agent.agent
 3. 我们暂定使用LLM as a Judge评估一个节点，但与最后地叶子节点，也即那些只有一个数地节点，可以直接比较其与目标数是否相等。
 
 实现上我们仅实现了评估和思维树设计，搜索和最终的目标检查还未实现。
+
+代码在 `src/chat_agent/tot.py` 中。
