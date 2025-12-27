@@ -21,8 +21,18 @@ class OpenAILLM(BaseLLM):
             messages=messages,
             **self.inference_cfgs,
         )
+        raw_response = response.choices[0].message.content
+        if "<search_query>" in raw_response and "</search_query>" in raw_response:
+            search_query = raw_response.split("<search_query>")[1].split("</search_query>")[0].strip()
+            return OutputData(
+                response="",
+                input=input_data,
+                is_tool_calling=True,
+                search_query=search_query,
+                meta_data={},
+            )
         return OutputData(
-            response=response.choices[0].message.content,
+            response=raw_response,
             input=input_data,
             is_tool_calling=False,
             search_query=None,

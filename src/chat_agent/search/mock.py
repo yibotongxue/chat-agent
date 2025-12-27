@@ -6,4 +6,5 @@ class MockSearch(BaseSearch):
         super().__init__(search_cfgs)
 
     def search(self, query: str) -> list[str]:
+        print("MockSearch received query:", query)
         return ["Mocked search result 1 for query: " + query,]
