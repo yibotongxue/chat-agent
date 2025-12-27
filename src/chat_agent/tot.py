@@ -25,6 +25,7 @@ class ThoughtNode:
     """思维树节点 - 请补充必要字段"""
     state: State
     childrens: List['ThoughtNode']
+    success_expression: Optional[str] = None
     # TODO: 添加其他字段
 
 def evaluate(state: State, llm: BaseLLM) -> float:
@@ -78,9 +79,10 @@ class TreeOfThoughts:
 
 class Point24Solver:
     """24点求解器"""
-    def init(self):
+    def init(self, llm: BaseLLM):
         # TODO: 实现
-        pass
+        self.llm = llm
+
     def solve(self, numbers: List[int]) -> Optional[str]:
         """
         求解24点
@@ -90,4 +92,17 @@ class Point24Solver:
             表达式字符串，无解返回None
         """
         # TODO: 实现
-        pass
+        tree = TreeOfThoughts(
+            thought_generator=thought_generator,
+            state_evaluator=evaluate,
+            goal_checker=None,  # TODO: 实现目标检查器
+            llm=self.llm,
+        )
+        initial_state = State(
+            goal=24,
+            available_numbers=numbers,
+            decided_operation="",
+            decided_number=0,
+        )
+        result_node = tree.search(initial_state)
+        return result_node.success_expression if result_node else None

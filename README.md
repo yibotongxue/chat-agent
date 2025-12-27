@@ -1,86 +1,26 @@
-# Python项目模板
+# 对话智能体与思维树
 
-这是一个Python项目的模板，可以帮助建立一个初始的规范开发环境。
+## 对话智能体
 
-## 使用
+实现：
 
-点击左上方 `use this template` 按钮，使用本模板建立一个自己的仓库，拉取到本地，即可继续开发。本项目使用 `uv` 管理依赖，项目本身也是使用命令
+1. 正常的多轮对话
+2. 通过提示词允许模型调用搜索工具，拼接到用户查询中
+3. 使用类的继承，支持不同的模型提供商的不同接口，只需要实现 `BaseLLM`
 
-```bash
-uv init python-project-template --python=3.12
-```
-
-命令创建的。
-
-使用命令
+运行方式：
 
 ```bash
 uv sync
+uv run -m chat_agent.agent
 ```
 
-安装开发依赖，如果没有安装 `uv` 的，可以使用命令
+## 思维树
 
-```bash
-pip3 install uv
-```
+设计的思维状态为：
 
-安装。 `uv` 工具的相关内容可以参考[文档](https://docs.astral.sh/uv/)或[中文文档](https://uv.doczh.com/)。
+1. 设计思维状态为当前确定的数和操作，从而根据目标决定另一个数，以及下一步需要从剩余的数中得到该数。比如3，3,8,8得到24,第一步可能是确定3和乘法，然后下一个状态就是需要从3,8,8得到8.这里对于除法和减法可能还需要确定前后顺序。
+2. 得到思维树后，我们判断一个结点是否可行，只需要考察其子节点是否有可行者。
+3. 我们暂定使用LLM as a Judge评估一个节点，但与最后地叶子节点，也即那些只有一个数地节点，可以直接比较其与目标数是否相等。
 
-激活环境
-
-```bash
-source .venv/bin/activate
-```
-
-安装 `pre-commit` 工具
-
-```bash
-pre-commit install
-```
-
-`pre-commit` 工具的相关内容可以参考[文档](https://pre-commit.com/)。使用这个工具，会在每次git commit之前进行一些检查。我们的检查配置文件在[.pre-commit-config.yaml](./.pre-commit-config.yaml)，相关地说明参考[配置文件说明](#pre-commit-配置文件说明)。
-
-## 适配
-
-一般的，可以修改 `src/python_project_template` 为自己的目录名，并同步修改[pyproject.toml](./pyproject.toml)中的相关内容。可以将[pyproject.toml](./pyproject.toml)中的如下内容
-
-```toml
-[project]
-name = "python-project-template"
-version = "0.1.0"
-description = "Python项目模板"
-readme = "README.md"
-requires-python = ">=3.12"
-dependencies = []
-```
-
-中的项目名为自己的项目名，对应地修改项目描述，按照需要调整版本号等。
-
-## `pre-commit` 配置文件说明
-
-这里直接复制[DeepSeek](https://deepseek.com/)的说明：
-
-1. **基础代码检查与修复**（来自 `pre-commit-hooks`）
-   - 检查符号链接有效性
-   - 删除行尾空格、确保文件末尾换行
-   - 验证 YAML/TOML 文件语法
-   - 阻止提交大文件（默认 >500KB）
-   - 检测调试语句（如 `import pdb`）和私钥泄露
-   - 检查可执行文件的 shebang 声明
-
-2. **Python 代码格式化**
-   - `isort`：自动排序 import 语句
-   - `black-jupyter`：格式化 Python 和 Jupyter 笔记本代码（遵循 PEP8）
-
-3. **Python 代码优化**
-   - `autoflake`：移除未使用的 imports 和变量
-   - `pyupgrade`：自动升级代码到 Python 3.12+ 语法
-
-4. **安全检查**
-   - `bandit`：扫描 Python 代码的安全漏洞（使用 `.bandit.yml` 配置）
-
-5. **静态类型检查**
-   - `mypy`：严格类型检查（Python 3.12 环境，忽略测试目录）
-
-6. **拼写检查**
-   - `codespell`：修复常见英文拼写错误
+实现上我们仅实现了评估和思维树设计，搜索和最终的目标检查还未实现。
